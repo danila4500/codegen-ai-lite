@@ -1,0 +1,43 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.loader {
+    display: flex;
+    align-items: flex-end;
+}
+
+.bar {
+    width: 30px;
+    height: 100px;
+    margin: 0 5px;
+    background-color: #3498db;
+    perspective: 1000px;
+    animation: bounce 1s infinite alternate;
+}
+
+#bar1 {
+    animation-delay: 0s;
+}
+
+#bar2 {
+    animation-delay: 0.2s;
+}
+
+#bar3 {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0) rotateY(0deg);
+    }
+    100% {
+        transform: translateY(-50px) rotateY(360deg);
+    }
+}

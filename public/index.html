@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+        <title>Генератор кода</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFcwbNJmoyv5y触れたHTML, CSS, и JavaScript код будет отформатирован с подсветкой синтаксиса.">
+        <link rel="stylesheet" href="/public/style.css">
+    </head>
+    <body>
+        <h1>Генератор кода</h1>
+            <div class="toolbar">
+        <form id="generateForm" method="POST" action="/generate" style="display: flex; align-items: center;">
+            <label for="prompt">Введите запрос:</label>
+            <input type="text" name="prompt" id="prompt">
+            <button type="submit">Генерировать</button>
+        </form>
+        <button id="saveCodeButton" type="button" disabled>Сохранить</button>
+        <button id="downloadCodeButton" class="downloadCodeButton" type="button" disabled>Скачать</button>
+        </div>
+        <div class="content">
+            <iframe id="generatedFrame" src="" width="80%" height="400px"></iframe>
+        </div>
+    
+        <div class="code-container-wrapper" id="codeContainerWrapper">
+            <div class="code-container" data-name="html" id="htmlCodeContainer">
+                <label for="htmlCode">HTML:</label><br>
+                <pre><code class="language-html" id="htmlCode" contenteditable="true"></code></pre>
+                <div class="resizer resizer-horizontal" data-target="htmlCodeContainer" contenteditable="true"></div>  
+            </div>
+            <div class="code-container" data-name="css" id="cssCodeContainer">
+                <label for="cssCode">CSS:</label><br>
+                <pre><code class="language-css" id="cssCode" contenteditable="true"></code></pre>
+                <div class="resizer resizer-horizontal" data-target="cssCodeContainer" contenteditable="true"></div>  
+            </div>
+            <div class="code-container" data-name="js" id="jsCodeContainer">
+                <label for="jsCode">JavaScript:</label><br>
+                <pre><code class="language-javascript" id="jsCode" contenteditable="true"></code></pre>
+                <div class="resizer resizer-horizontal" data-target="jsCodeContainer" contenteditable="true"></div>  
+            </div>
+        </div>
+    
+       
+ 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-触れた内容が途中で切れています"></script>
+    <script>
+                document.getElementById('generateForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const prompt = document.getElementById('prompt').value;
+    const iframe = document.getElementById('generatedFrame');
+
+    iframe.src = '/public/loading.html';
+
+    fetch('/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `prompt=${encodeURIComponent(prompt)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        iframe.src = '/public/generated/index.html';
+
+        document.getElementById('htmlCode').textContent = data.html;
+        document.getElementById('cssCode').textContent = data.css;
+        document.getElementById('jsCode').textContent = data.js;
+
+        Prism.highlightAll();
+        initializeResizing();
+
+          // Удаляем атрибут disabled, чтобы активировать кнопки
+        document.getElementById('saveCodeButton').removeAttribute('disabled');
+        document.getElementById('downloadCodeButton').removeAttribute('disabled');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('htmlCode').textContent = 'Error generating code.';
+        document.getElementById('cssCode').textContent = '';
+        document.getElementById('jsCode').textContent = '';
+        iframe.src = '';
+    });
+});
+
+// Обработчик для кнопки "Сохранить"
+document.getElementById('saveCodeButton').addEventListener('click', function() {
+    const html = document.getElementById('htmlCode').textContent;
+    const css = document.getElementById('cssCode').textContent;
+    const js = document.getElementById('jsCode').textContent;
+
+    fetch('/save-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ html, css, js })
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Code saved successfully!');
+            const iframe = document.getElementById('generatedFrame');
+            iframe.src = '/public/generated/index.html';
+            Prism.highlightAll();
+        } else {
+            console.error('Error saving code:', response.status);
+            alert('Error saving code.');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving code:', error);
+        alert('Error saving code.');
+    });
+});
+
+// Обработчик для кнопки "Скачать"
+document.getElementById('downloadCodeButton').addEventListener('click', async function() {
+    const html = document.getElementById('htmlCode').textContent;
+    const css = document.getElementById('cssCode').textContent;
+    const js = document.getElementById('jsCode').textContent;
+
+    try {
+        const response = await fetch('/download-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ html, css, js })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'code.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error downloading code:', error);
+        alert('Error downloading code.');
+    }
+});
+        
+         // изменение размеров блоков кода
+         function initializeResizing() {
+            const codeContainerWrapper = document.getElementById('codeContainerWrapper');
+            const codeContainers = Array.from(codeContainerWrapper.querySelectorAll('.code-container'));
+            const minWidthPercent = 8; // Минимальная ширина в процентах
+            const gapPercent = 2; // Процент промежутка между блоками
+
+            // Функция для пересчета размеров
+            function recalculateSizes(resizingContainer) {
+                let totalWidth = 100;
+                let nonResizingContainers = codeContainers.filter(container => container !== resizingContainer);
+                let nonResizingWidth = 0;
+
+                // Вычисляем суммарную ширину контейнеров
+                nonResizingContainers.forEach(container => {
+                    const width = parseFloat(container.style.width) || 30; //  30% по умолчанию
+                    nonResizingWidth += width;
+                });
+
+                // Вычисляем доступное пространство для контейнера
+                const availableWidth = Math.max(minWidthPercent, totalWidth - nonResizingWidth - (nonResizingContainers.length - 1) * gapPercent);
+
+                // Обновляем размеры
+                codeContainers.forEach(container => {
+                    if (container === resizingContainer) {
+                        container.style.width = `${Math.max(minWidthPercent, parseFloat(container.style.width) || 30)}%`;
+                    } else {
+                         container.style.width = `${Math.max(minWidthPercent, ((totalWidth - (parseFloat(resizingContainer.style.width) || 30))
+                          - (nonResizingContainers.length -1 ) * gapPercent) / nonResizingContainers.length)}%`;
+                    }
+                });
+            }
+
+            // обработчики для изменения размеров
+            codeContainers.forEach(container => {
+                const resizer = container.querySelector('.resizer');
+                if (!resizer) return; 
+
+                let startX, startWidth;
+
+                resizer.addEventListener('mousedown', function(e) {
+                    e.preventDefault(); 
+
+                    startX = e.clientX;
+                    startWidth = parseFloat(getComputedStyle(container).width);
+
+                    function onMouseMove(e) {
+                        const deltaX = e.clientX - startX;
+                        let newWidth = startWidth + deltaX;
+                        const newWidthPercent = Math.max(minWidthPercent, newWidth 
+                        / codeContainerWrapper.offsetWidth * 100);
+                        container.style.width = `${newWidthPercent}%`;
+                        recalculateSizes(container);
+                    }
+
+                    function onMouseUp() {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+            });
+        }
+        initializeResizing()
+    </script>
+</body>
+</html>

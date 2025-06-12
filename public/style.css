@@ -1,0 +1,180 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+}
+
+.toolbar {
+    padding: 15px;
+    background-color: #eee; /* Светло-серый фон */
+    display: flex;
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center;     /* Выравнивание по вертикали */
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Стили для формы внутри панели инструментов */
+.toolbar form {
+    display: flex;
+    align-items: center; /* Выравнивание элементов формы по вертикали */
+    gap: 10px;         /* Расстояние между элементами формы */
+}
+
+/* Стили для метки (label) */
+.toolbar label {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Стили для текстового поля (input) */
+.toolbar input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    flex: 1;         /* Поле ввода растягивается, заполняя пространство */
+    min-width: 150px; /* Минимальная ширина поля ввода */
+    max-width: 300px; /* Максимальная ширина поля ввода */
+}
+
+/* Стили для кнопок */
+.toolbar button {
+    padding: 10px 15px;
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Плавное изменение цвета */
+}
+
+.toolbar button:hover {
+    background-color: #317433; /* Более темный зеленый при наведении */
+}
+
+/* Стили для кнопки "Скачать" (чтобы не конфликтовать с общими стилями button) */
+.toolbar button.downloadCodeButton {
+    background-color: #3d8f3f; /* Синий цвет для кнопки "Скачать" */
+}
+
+.toolbar button.downloadCodeButton:hover {
+    background-color: #317433; /* Более темный синий при наведении */
+}
+
+/* Стили для кнопки "Сохранить" и "Скачать" (чтобы не конфликтовать с общими стилями button)*/
+#saveCodeButton,
+#downloadCodeButton {
+    padding: 10px 20px; /*  Увеличил отступы для наглядности  */
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block; /* Важно: для правильного отображения в flex-контейнере */
+    margin: 0; /* Убираем margin по умолчанию, чтобы не ломать flexbox */
+    margin-left: 10px;
+    white-space: nowrap; 
+    font-size: 14px;   
+    line-height: 1;   
+}
+
+#saveCodeButton:disabled,
+#downloadCodeButton:disabled {
+    background-color: #ccc; 
+    color: #666;         
+    cursor: not-allowed;  
+    pointer-events: none; 
+}
+
+#saveCodeButton {
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+    border: none;
+}
+
+#saveCodeButton:hover {
+    background-color: #317433; /* Более темный зеленый при наведении */
+}
+#downloadCodeButton {
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+    border: none;
+}
+
+#downloadCodeButton:hover {
+    background-color: #317433; /* Более темный зеленый при наведении */
+}
+
+.textBox {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+    height: 400px;
+}
+
+
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#generatedFrame {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%;
+    height: 600px;
+}
+
+/* Контейнер для блоков кода */
+.code-container-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Стили для контейнера блоков кода */
+.code-container {
+    width: 30%;
+    padding: 10px;
+    box-sizing: border-box;
+    min-width: 8%;
+    position: relative;  /*  Для позиционирования resizer */
+}
+
+/* Стили для меток (label) */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+
+/* Стиль для resizer */
+.resizer {
+    width: 5px;  /* Ширина resizer */
+    height: 100%;
+    background-color: #ddd;
+    position: absolute; /* Абсолютное позиционирование */
+    top: 0;
+    right: -2.5px; /*  Расположение справа от блока */
+    cursor: col-resize;  /* Курсор при наведении */
+    z-index: 1; /*  Чтобы resizer был поверх текста */
+}
