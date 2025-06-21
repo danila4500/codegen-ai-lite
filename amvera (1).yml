@@ -1,0 +1,12 @@
+meta:
+  environment: node
+  toolchain:
+    name: npm
+    version: 18
+build:
+  artifacts:
+    '*': /
+  command: node server.js
+run:
+  persistenceMount: /data
+  containerPort: 80
