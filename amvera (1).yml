@@ -5,7 +5,8 @@ meta:
     version: "18"
 build:
   skip: false
-  additionalCommands: npm install
+  additionalCommands:
+    - npm install
   artifacts:
     "*": /
 run:
@@ -16,4 +17,3 @@ run:
   persistenceMount: /data
   containerPort: "80"
   servicePort: "80"
-
