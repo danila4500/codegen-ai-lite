@@ -2,11 +2,18 @@ meta:
   environment: node
   toolchain:
     name: npm
-    version: 18
+    version: "18"
 build:
+  skip: false
+  additionalCommands: npm install
   artifacts:
-    '*': /
-  command: node server.js
+    "*": /
 run:
+  scriptName: ""
+  scriptArguments: null
+  nodeArguments: null
+  command: npm start
   persistenceMount: /data
-  containerPort: 80
+  containerPort: "80"
+  servicePort: "80"
+
