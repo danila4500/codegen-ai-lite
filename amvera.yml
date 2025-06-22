@@ -1,8 +1,0 @@
-meta:
-  environment: node
-  toolchain:
-    name: browser
-    version: 18
-build:
-  artifacts:
-    build/*: /
